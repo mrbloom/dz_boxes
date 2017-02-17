@@ -1,5 +1,5 @@
 ﻿<doctype html>
-<body>
+
 <style>
 
 *{
@@ -29,6 +29,15 @@
 	left:100px;
 	transition: .05s;
 }
+
+
+.desk {	
+	width: 600px;
+	height: 600px;
+	border: 1px solid black;
+		
+	position:absolute;
+}
 </style>
 
 <script>
@@ -36,11 +45,14 @@ let MOUSEUP;
 let dr;   //step for box moving 
 let mrgn; //collision objects overlap  = -20; //, //bh = b.clientHeight;
 let conts;//opacity elements  that contains colliding objects
+let desk;
 
 window.onload = function(){
 	MOUSEUP = true;
 	dr = 2;
 	mrgn = 10;
+
+	desk = document.getElementsByClassName("desk")[0];
 
 	conts = document.getElementsByClassName("cont");
 	// boxes = [...conts];
@@ -68,19 +80,19 @@ function onmouseenter(e){
 	let h = this.clientHeight;
 
 	if ( in_area(e.offsetX,0) && MOUSEUP)
-		if (!collides(this,conts,dr))
+		if (!collides(this,conts,dr) && in_container(this,desk,dr))
 			this.style.left = this.offsetLeft + dr + 'px';
 
 	if ( in_area(e.offsetX,w ) && MOUSEUP)
-		if (!collides(this,conts,-dr))
+		if (!collides(this,conts,-dr) && in_container(this,desk,-dr))
 			this.style.left = this.offsetLeft - dr + 'px';	
 
 	if ( in_area(e.offsetY,0) && MOUSEUP)
-		if (!collides(this,conts,0,dr))
+		if (!collides(this,conts,0,dr) && in_container(this,desk,0,dr))
 			this.style.top = this.offsetTop + dr + 'px';
 
-	if ( in_area(e.offsetY,h) && MOUSEUP )
-		if (!collides(this,conts,0,-dr))
+	if ( in_area(e.offsetY,h) && MOUSEUP)
+		if (!collides(this,conts,0,-dr) && in_container(this,desk,0,-dr))
 			this.style.top = this.offsetTop - dr + 'px';	
 }
 
@@ -103,34 +115,31 @@ function collides(a,bs,dx=0,dy=0){
 	return false;
 }
 
-// function onmouseup(e){
-// 	MOUSEUP = true;
-// }
+function in_container(a,cont,dx=0,dy=0){
+	let ax = a.offsetLeft+dx,   contx = cont.offsetLeft,
+		ay = a.offsetTop+dy,    conty = cont.offsetTop,
+		aw = a.clientWidth,     contw = cont.clientWidth,
+		ah = a.clientHeight,	conth = cont.clientHeight;	
 
-// function onmousedown(e){
-// 	MOUSEUP = false;
-// }
-
+	if ( (ax-contx>=-mrgn) && (ax+aw-contx-contw<=mrgn) && (ay-conty>=mrgn) && (ay+ah-conty-conth<=mrgn) )
+		return true;
+	return false;
+}
 
 
 </script>
+<body>
+	<div class="desk">
+		<div class="cont">
+			<div class="box"></div>
+		</div>
 
+		<div class="cont" style="left:300px">
+			<div class="box"></div>
+		</div>
 
-<div class="cont">
-	<div class="box"></div>
-</div>
-
-<div class="cont" style="left:300px">
-	<div class="box"></div>
-</div>
-
-<div class="cont" style="left:500px; top:10px;">
-<!-- <div class="top"></div> -->
-	<div class="box"></div>
-
-<!-- <div class="top"></div> -->
-
-</div>
-
-
+		<div class="cont" style="left:500px; top:10px;">
+			<div class="box"></div>
+		</div>
+	</div>
 </body>
