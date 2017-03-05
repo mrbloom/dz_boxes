@@ -41,7 +41,7 @@
 
 .desk {	
 	width: 50%;
-	height: 500px;
+	height: 700px;
 	border: 1px solid black;
 		
 	position:absolute;
@@ -55,6 +55,7 @@ let units; //units of step percent pixels
 let mrgn; //collision objects overlap  = -20; //, //bh = b.clientHeight;
 let conts;//opacity elements  that contains colliding objects
 let desk;
+let cur_block; //active block 
 
 
 window.onload = function(){
@@ -71,10 +72,15 @@ window.onload = function(){
 		//c.addEventListener("mouseenter",onmouseenter);
 		c.addEventListener("mousemove",onmouseenter);
 
+
 	}
+	cur_block = conts[conts.length-1]
+
 	document.onmousedown = () => MOUSEUP=false;
 	//addEventListener("mousedown",onmousedown);
 	document.onmouseup = () => MOUSEUP = true;
+
+	document.addEventListener("keydown",onArrowsDown);
 	//addEventListener("mouseup",onmouseup);
 }
 
@@ -85,10 +91,46 @@ function in_area(val,cntr,dx=15){
 
 }
 
+function onArrowsDown(e){
+	let w = cur_block.clientWidth;
+	let h = cur_block.clientHeight;
+	let dr = (units == "%") ? w*step/100 : step; 
+
+	switch(e.key){
+		case "ArrowUp":
+			if (!collides(cur_block,conts,0,-dr) && in_container(cur_block,desk,0,-dr))
+				cur_block.style.top = cur_block.offsetTop - dr + 'px';	
+
+			break;
+		case "ArrowDown":
+			if (!collides(cur_block,conts,0,dr) && in_container(cur_block,desk,0,dr))
+				cur_block.style.top = cur_block.offsetTop + dr + 'px';
+
+			break;
+		case "ArrowLeft":
+			if (!collides(cur_block,conts,-dr) && in_container(cur_block,desk,-dr))
+				cur_block.style.left = cur_block.offsetLeft - dr + 'px';	
+
+			break;
+		case "ArrowRight":
+			if (!collides(cur_block,conts,dr) && in_container(cur_block,desk,dr))
+				cur_block.style.left = cur_block.offsetLeft + dr + 'px';		
+
+			break;
+		default:
+			console.log(e.key);
+
+	}
+
+
+
+}
+
 function onmouseenter(e){
 	let w = this.clientWidth;
 	let h = this.clientHeight;
 	let dr = (units == "%") ? w*step/100 : step; 
+	cur_block = this;
 		 
 
 	if ( in_area(e.offsetX,0) && MOUSEUP)
@@ -107,6 +149,8 @@ function onmouseenter(e){
 		if (!collides(this,conts,0,-dr) && in_container(this,desk,0,-dr))
 			this.style.top = this.offsetTop - dr + 'px';	
 }
+
+
 
 function collide(a,b,dx = 0,dy = 0){
 	if (a===b)
